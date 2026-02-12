@@ -24,7 +24,6 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           status: string | null
-          updated_at: string
           user_id: string
         }
         Insert: {
@@ -36,7 +35,6 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string | null
-          updated_at?: string
           user_id: string
         }
         Update: {
@@ -48,7 +46,6 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string | null
-          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -61,154 +58,45 @@ export type Database = {
           },
         ]
       }
-      audit_logs: {
-        Row: {
-          action: string
-          created_at: string
-          details: Json | null
-          id: string
-          ip_address: string | null
-          record_id: string | null
-          table_name: string
-          user_id: string
-        }
-        Insert: {
-          action: string
-          created_at?: string
-          details?: Json | null
-          id?: string
-          ip_address?: string | null
-          record_id?: string | null
-          table_name: string
-          user_id: string
-        }
-        Update: {
-          action?: string
-          created_at?: string
-          details?: Json | null
-          id?: string
-          ip_address?: string | null
-          record_id?: string | null
-          table_name?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      backup_settings: {
-        Row: {
-          external_storage_config: Json | null
-          external_storage_type: string | null
-          frequency: string | null
-          id: string
-          is_enabled: boolean | null
-          last_backup_at: string | null
-          next_backup_at: string | null
-          retention_days: number | null
-          tables_to_backup: string[] | null
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          external_storage_config?: Json | null
-          external_storage_type?: string | null
-          frequency?: string | null
-          id?: string
-          is_enabled?: boolean | null
-          last_backup_at?: string | null
-          next_backup_at?: string | null
-          retention_days?: number | null
-          tables_to_backup?: string[] | null
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          external_storage_config?: Json | null
-          external_storage_type?: string | null
-          frequency?: string | null
-          id?: string
-          is_enabled?: boolean | null
-          last_backup_at?: string | null
-          next_backup_at?: string | null
-          retention_days?: number | null
-          tables_to_backup?: string[] | null
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
-      categories: {
-        Row: {
-          created_at: string
-          description: string | null
-          icon: string | null
-          id: string
-          is_active: boolean | null
-          name: string
-          name_ar: string | null
-          name_en: string | null
-          parent_id: string | null
-          sort_order: number | null
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean | null
-          name: string
-          name_ar?: string | null
-          name_en?: string | null
-          parent_id?: string | null
-          sort_order?: number | null
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean | null
-          name?: string
-          name_ar?: string | null
-          name_en?: string | null
-          parent_id?: string | null
-          sort_order?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "categories_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       contributions: {
         Row: {
           amount: number
           created_at: string
+          currency: string | null
           id: string
-          project_id: string
-          type: string
+          payment_id: string | null
+          project_id: string | null
+          status: string | null
           user_id: string
         }
         Insert: {
-          amount: number
+          amount?: number
           created_at?: string
+          currency?: string | null
           id?: string
-          project_id: string
-          type: string
+          payment_id?: string | null
+          project_id?: string | null
+          status?: string | null
           user_id: string
         }
         Update: {
           amount?: number
           created_at?: string
+          currency?: string | null
           id?: string
-          project_id?: string
-          type?: string
+          payment_id?: string | null
+          project_id?: string | null
+          status?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "contributions_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "contributions_project_id_fkey"
             columns: ["project_id"]
@@ -225,10 +113,10 @@ export type Database = {
           created_at: string
           created_by: string | null
           error_message: string | null
-          file_path: string | null
-          file_size: number | null
+          file_size: string | null
           format: string | null
           id: string
+          size_bytes: number | null
           status: string | null
           tables_included: string[] | null
         }
@@ -238,10 +126,10 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           error_message?: string | null
-          file_path?: string | null
-          file_size?: number | null
+          file_size?: string | null
           format?: string | null
           id?: string
+          size_bytes?: number | null
           status?: string | null
           tables_included?: string[] | null
         }
@@ -251,10 +139,10 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           error_message?: string | null
-          file_path?: string | null
-          file_size?: number | null
+          file_size?: string | null
           format?: string | null
           id?: string
+          size_bytes?: number | null
           status?: string | null
           tables_included?: string[] | null
         }
@@ -263,7 +151,7 @@ export type Database = {
       faqs: {
         Row: {
           answer: string
-          category: string
+          category: string | null
           created_at: string
           id: string
           is_active: boolean | null
@@ -273,7 +161,7 @@ export type Database = {
         }
         Insert: {
           answer: string
-          category?: string
+          category?: string | null
           created_at?: string
           id?: string
           is_active?: boolean | null
@@ -283,7 +171,7 @@ export type Database = {
         }
         Update: {
           answer?: string
-          category?: string
+          category?: string | null
           created_at?: string
           id?: string
           is_active?: boolean | null
@@ -334,16 +222,15 @@ export type Database = {
           due_date: string | null
           id: string
           invoice_number: string
-          items: Json
+          items: Json | null
           notes: string | null
           paid_at: string | null
-          project_id: string | null
           service_request_id: string | null
           status: string | null
-          subtotal: number
+          subtotal: number | null
           tax_amount: number | null
           tax_rate: number | null
-          total: number
+          total: number | null
           updated_at: string
           user_id: string
         }
@@ -354,16 +241,15 @@ export type Database = {
           due_date?: string | null
           id?: string
           invoice_number: string
-          items?: Json
+          items?: Json | null
           notes?: string | null
           paid_at?: string | null
-          project_id?: string | null
           service_request_id?: string | null
           status?: string | null
-          subtotal?: number
+          subtotal?: number | null
           tax_amount?: number | null
           tax_rate?: number | null
-          total?: number
+          total?: number | null
           updated_at?: string
           user_id: string
         }
@@ -374,16 +260,15 @@ export type Database = {
           due_date?: string | null
           id?: string
           invoice_number?: string
-          items?: Json
+          items?: Json | null
           notes?: string | null
           paid_at?: string | null
-          project_id?: string | null
           service_request_id?: string | null
           status?: string | null
-          subtotal?: number
+          subtotal?: number | null
           tax_amount?: number | null
           tax_rate?: number | null
-          total?: number
+          total?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -394,37 +279,41 @@ export type Database = {
           content: string
           created_at: string
           id: string
-          project_id: string
-          sender_id: string
+          is_read: boolean | null
+          project_id: string | null
+          sender_email: string | null
+          sender_id: string | null
+          sender_name: string | null
+          subject: string | null
         }
         Insert: {
           content: string
           created_at?: string
           id?: string
-          project_id: string
-          sender_id: string
+          is_read?: boolean | null
+          project_id?: string | null
+          sender_email?: string | null
+          sender_id?: string | null
+          sender_name?: string | null
+          subject?: string | null
         }
         Update: {
           content?: string
           created_at?: string
           id?: string
-          project_id?: string
-          sender_id?: string
+          is_read?: boolean | null
+          project_id?: string | null
+          sender_email?: string | null
+          sender_id?: string | null
+          sender_name?: string | null
+          subject?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "messages_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       news: {
         Row: {
           archived_at: string | null
-          author_id: string
+          author_id: string | null
           category: string | null
           content: string
           created_at: string
@@ -441,7 +330,7 @@ export type Database = {
         }
         Insert: {
           archived_at?: string | null
-          author_id: string
+          author_id?: string | null
           category?: string | null
           content: string
           created_at?: string
@@ -458,7 +347,7 @@ export type Database = {
         }
         Update: {
           archived_at?: string | null
-          author_id?: string
+          author_id?: string | null
           category?: string | null
           content?: string
           created_at?: string
@@ -484,7 +373,7 @@ export type Database = {
           message: string | null
           metadata: Json | null
           title: string
-          type: string
+          type: string | null
           user_id: string
         }
         Insert: {
@@ -495,7 +384,7 @@ export type Database = {
           message?: string | null
           metadata?: Json | null
           title: string
-          type?: string
+          type?: string | null
           user_id: string
         }
         Update: {
@@ -506,7 +395,7 @@ export type Database = {
           message?: string | null
           metadata?: Json | null
           title?: string
-          type?: string
+          type?: string | null
           user_id?: string
         }
         Relationships: []
@@ -515,7 +404,7 @@ export type Database = {
         Row: {
           amount_max: number | null
           amount_min: number | null
-          author_id: string
+          author_id: string | null
           category: string | null
           contact_email: string | null
           contact_phone: string | null
@@ -531,7 +420,7 @@ export type Database = {
           is_active: boolean | null
           is_featured: boolean | null
           location: string | null
-          opportunity_type: string
+          opportunity_type: string | null
           published_at: string | null
           status: string | null
           title: string
@@ -541,33 +430,7 @@ export type Database = {
         Insert: {
           amount_max?: number | null
           amount_min?: number | null
-          author_id: string
-          category?: string | null
-          contact_email?: string | null
-          contact_phone?: string | null
-          content: string
-          created_at?: string
-          currency?: string | null
-          deadline?: string | null
-          description?: string | null
-          eligibility?: string | null
-          external_link?: string | null
-          id?: string
-          image_url?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          location?: string | null
-          opportunity_type: string
-          published_at?: string | null
-          status?: string | null
-          title: string
-          updated_at?: string
-          views_count?: number | null
-        }
-        Update: {
-          amount_max?: number | null
-          amount_min?: number | null
-          author_id?: string
+          author_id?: string | null
           category?: string | null
           contact_email?: string | null
           contact_phone?: string | null
@@ -583,7 +446,33 @@ export type Database = {
           is_active?: boolean | null
           is_featured?: boolean | null
           location?: string | null
-          opportunity_type?: string
+          opportunity_type?: string | null
+          published_at?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          amount_max?: number | null
+          amount_min?: number | null
+          author_id?: string | null
+          category?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          content?: string
+          created_at?: string
+          currency?: string | null
+          deadline?: string | null
+          description?: string | null
+          eligibility?: string | null
+          external_link?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          location?: string | null
+          opportunity_type?: string | null
           published_at?: string | null
           status?: string | null
           title?: string
@@ -594,15 +483,12 @@ export type Database = {
       }
       payments: {
         Row: {
-          access_count: number | null
           amount: number
           created_at: string
           currency: string | null
-          encrypted_metadata: string | null
           id: string
-          last_accessed_at: string | null
           metadata: Json | null
-          payment_method: string
+          payment_method: string | null
           payment_reference: string | null
           project_id: string | null
           service_request_id: string | null
@@ -611,15 +497,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          access_count?: number | null
-          amount: number
+          amount?: number
           created_at?: string
           currency?: string | null
-          encrypted_metadata?: string | null
           id?: string
-          last_accessed_at?: string | null
           metadata?: Json | null
-          payment_method: string
+          payment_method?: string | null
           payment_reference?: string | null
           project_id?: string | null
           service_request_id?: string | null
@@ -628,15 +511,12 @@ export type Database = {
           user_id: string
         }
         Update: {
-          access_count?: number | null
           amount?: number
           created_at?: string
           currency?: string | null
-          encrypted_metadata?: string | null
           id?: string
-          last_accessed_at?: string | null
           metadata?: Json | null
-          payment_method?: string
+          payment_method?: string | null
           payment_reference?: string | null
           project_id?: string | null
           service_request_id?: string | null
@@ -652,39 +532,32 @@ export type Database = {
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "payments_service_request_id_fkey"
-            columns: ["service_request_id"]
-            isOneToOne: false
-            referencedRelation: "service_requests"
-            referencedColumns: ["id"]
-          },
         ]
       }
       platform_settings: {
         Row: {
           category: string | null
+          created_at: string
           id: string
           key: string
           updated_at: string
-          updated_by: string | null
-          value: Json
+          value: string | null
         }
         Insert: {
           category?: string | null
+          created_at?: string
           id?: string
           key: string
           updated_at?: string
-          updated_by?: string | null
-          value: Json
+          value?: string | null
         }
         Update: {
           category?: string | null
+          created_at?: string
           id?: string
           key?: string
           updated_at?: string
-          updated_by?: string | null
-          value?: Json
+          value?: string | null
         }
         Relationships: []
       }
@@ -696,13 +569,13 @@ export type Database = {
           company_name: string | null
           country: string | null
           created_at: string
+          email: string | null
           first_name: string | null
           id: string
           is_verified: boolean | null
           last_name: string | null
           phone: string | null
           referral_code: string | null
-          referred_by: string | null
           total_commissions: number | null
           total_referrals: number | null
           updated_at: string
@@ -715,13 +588,13 @@ export type Database = {
           company_name?: string | null
           country?: string | null
           created_at?: string
+          email?: string | null
           first_name?: string | null
           id: string
           is_verified?: boolean | null
           last_name?: string | null
           phone?: string | null
           referral_code?: string | null
-          referred_by?: string | null
           total_commissions?: number | null
           total_referrals?: number | null
           updated_at?: string
@@ -734,13 +607,13 @@ export type Database = {
           company_name?: string | null
           country?: string | null
           created_at?: string
+          email?: string | null
           first_name?: string | null
           id?: string
           is_verified?: boolean | null
           last_name?: string | null
           phone?: string | null
           referral_code?: string | null
-          referred_by?: string | null
           total_commissions?: number | null
           total_referrals?: number | null
           updated_at?: string
@@ -750,21 +623,18 @@ export type Database = {
       }
       project_evaluations: {
         Row: {
-          actions_structuration: Json | null
+          actions_structuration: string[] | null
           certified_at: string | null
-          certified_by: string | null
           created_at: string
-          evaluated_by: string | null
-          evaluation_data: Json | null
-          faiblesses: Json | null
-          forces: Json | null
+          faiblesses: string[] | null
+          forces: string[] | null
           id: string
           is_active: boolean | null
           is_certified: boolean | null
-          messages_strategiques: Json | null
+          messages_strategiques: string[] | null
           niveau: string | null
           project_id: string
-          recommandations: Json | null
+          recommandations: string[] | null
           resume: string | null
           score_equipe: number | null
           score_financier: number | null
@@ -777,21 +647,18 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          actions_structuration?: Json | null
+          actions_structuration?: string[] | null
           certified_at?: string | null
-          certified_by?: string | null
           created_at?: string
-          evaluated_by?: string | null
-          evaluation_data?: Json | null
-          faiblesses?: Json | null
-          forces?: Json | null
+          faiblesses?: string[] | null
+          forces?: string[] | null
           id?: string
           is_active?: boolean | null
           is_certified?: boolean | null
-          messages_strategiques?: Json | null
+          messages_strategiques?: string[] | null
           niveau?: string | null
           project_id: string
-          recommandations?: Json | null
+          recommandations?: string[] | null
           resume?: string | null
           score_equipe?: number | null
           score_financier?: number | null
@@ -804,21 +671,18 @@ export type Database = {
           user_id: string
         }
         Update: {
-          actions_structuration?: Json | null
+          actions_structuration?: string[] | null
           certified_at?: string | null
-          certified_by?: string | null
           created_at?: string
-          evaluated_by?: string | null
-          evaluation_data?: Json | null
-          faiblesses?: Json | null
-          forces?: Json | null
+          faiblesses?: string[] | null
+          forces?: string[] | null
           id?: string
           is_active?: boolean | null
           is_certified?: boolean | null
-          messages_strategiques?: Json | null
+          messages_strategiques?: string[] | null
           niveau?: string | null
           project_id?: string
-          recommandations?: Json | null
+          recommandations?: string[] | null
           resume?: string | null
           score_equipe?: number | null
           score_financier?: number | null
@@ -842,25 +706,28 @@ export type Database = {
       }
       project_updates: {
         Row: {
-          content: string | null
+          author_id: string | null
+          content: string
           created_at: string
           id: string
           project_id: string
-          title: string
+          title: string | null
         }
         Insert: {
-          content?: string | null
+          author_id?: string | null
+          content: string
           created_at?: string
           id?: string
           project_id: string
-          title: string
+          title?: string | null
         }
         Update: {
-          content?: string | null
+          author_id?: string | null
+          content?: string
           created_at?: string
           id?: string
           project_id?: string
-          title?: string
+          title?: string | null
         }
         Relationships: [
           {
@@ -878,17 +745,18 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          current_funding: number | null
           description: string | null
-          end_date: string | null
+          documents: Json | null
           fonds_disponibles: string | null
           funding_goal: number | null
-          funds_raised: number
+          funds_raised: number | null
           id: string
           image_url: string | null
           owner_id: string
           risk_score: string | null
           sector: string | null
-          status: string
+          status: string | null
           title: string
           updated_at: string
         }
@@ -897,17 +765,18 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          current_funding?: number | null
           description?: string | null
-          end_date?: string | null
+          documents?: Json | null
           fonds_disponibles?: string | null
           funding_goal?: number | null
-          funds_raised?: number
+          funds_raised?: number | null
           id?: string
           image_url?: string | null
           owner_id: string
           risk_score?: string | null
           sector?: string | null
-          status?: string
+          status?: string | null
           title: string
           updated_at?: string
         }
@@ -916,17 +785,18 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          current_funding?: number | null
           description?: string | null
-          end_date?: string | null
+          documents?: Json | null
           fonds_disponibles?: string | null
           funding_goal?: number | null
-          funds_raised?: number
+          funds_raised?: number | null
           id?: string
           image_url?: string | null
           owner_id?: string
           risk_score?: string | null
           sector?: string | null
-          status?: string
+          status?: string | null
           title?: string
           updated_at?: string
         }
@@ -940,10 +810,9 @@ export type Database = {
           created_at: string
           id: string
           paid_at: string | null
-          payment_id: string | null
           referee_id: string | null
           referral_code: string
-          referral_link: string
+          referral_link: string | null
           referrer_id: string
           status: string | null
         }
@@ -954,10 +823,9 @@ export type Database = {
           created_at?: string
           id?: string
           paid_at?: string | null
-          payment_id?: string | null
           referee_id?: string | null
           referral_code: string
-          referral_link: string
+          referral_link?: string | null
           referrer_id: string
           status?: string | null
         }
@@ -968,83 +836,22 @@ export type Database = {
           created_at?: string
           id?: string
           paid_at?: string | null
-          payment_id?: string | null
           referee_id?: string | null
           referral_code?: string
-          referral_link?: string
+          referral_link?: string | null
           referrer_id?: string
           status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "referrals_payment_id_fkey"
-            columns: ["payment_id"]
-            isOneToOne: false
-            referencedRelation: "payment_history"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "referrals_payment_id_fkey"
-            columns: ["payment_id"]
-            isOneToOne: false
-            referencedRelation: "payments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "referrals_payment_id_fkey"
-            columns: ["payment_id"]
-            isOneToOne: false
-            referencedRelation: "payments_secure"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sectors: {
-        Row: {
-          created_at: string
-          description: string | null
-          icon: string | null
-          id: string
-          is_active: boolean | null
-          name: string
-          name_ar: string | null
-          name_en: string | null
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean | null
-          name: string
-          name_ar?: string | null
-          name_en?: string | null
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean | null
-          name?: string
-          name_ar?: string | null
-          name_en?: string | null
         }
         Relationships: []
       }
       service_requests: {
         Row: {
-          annual_revenue: number | null
-          audit_trail: Json | null
+          admin_notes: string | null
           company_name: string | null
-          company_type: string | null
           created_at: string
           description: string | null
-          documents: Json | null
-          financial_data_encrypted: boolean | null
           funding_needed: number | null
           has_business_plan: boolean | null
-          has_financial_statements: boolean | null
           id: string
           project_stage: string | null
           sector: string | null
@@ -1054,17 +861,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          annual_revenue?: number | null
-          audit_trail?: Json | null
+          admin_notes?: string | null
           company_name?: string | null
-          company_type?: string | null
           created_at?: string
           description?: string | null
-          documents?: Json | null
-          financial_data_encrypted?: boolean | null
           funding_needed?: number | null
           has_business_plan?: boolean | null
-          has_financial_statements?: boolean | null
           id?: string
           project_stage?: string | null
           sector?: string | null
@@ -1074,17 +876,12 @@ export type Database = {
           user_id: string
         }
         Update: {
-          annual_revenue?: number | null
-          audit_trail?: Json | null
+          admin_notes?: string | null
           company_name?: string | null
-          company_type?: string | null
           created_at?: string
           description?: string | null
-          documents?: Json | null
-          financial_data_encrypted?: boolean | null
           funding_needed?: number | null
           has_business_plan?: boolean | null
-          has_financial_statements?: boolean | null
           id?: string
           project_stage?: string | null
           sector?: string | null
@@ -1100,8 +897,8 @@ export type Database = {
           created_at: string
           currency: string | null
           description: string | null
-          duration_days: number
-          duration_type: string
+          duration_days: number | null
+          duration_type: string | null
           features: Json | null
           id: string
           is_active: boolean | null
@@ -1114,13 +911,13 @@ export type Database = {
           created_at?: string
           currency?: string | null
           description?: string | null
-          duration_days: number
-          duration_type: string
+          duration_days?: number | null
+          duration_type?: string | null
           features?: Json | null
           id?: string
           is_active?: boolean | null
           name: string
-          price: number
+          price?: number
           sort_order?: number | null
           updated_at?: string
         }
@@ -1128,8 +925,8 @@ export type Database = {
           created_at?: string
           currency?: string | null
           description?: string | null
-          duration_days?: number
-          duration_type?: string
+          duration_days?: number | null
+          duration_type?: string | null
           features?: Json | null
           id?: string
           is_active?: boolean | null
@@ -1140,65 +937,23 @@ export type Database = {
         }
         Relationships: []
       }
-      user_documents: {
-        Row: {
-          created_at: string
-          file_name: string
-          file_path: string
-          file_size: number | null
-          file_type: string | null
-          id: string
-          notes: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          file_name: string
-          file_path: string
-          file_size?: number | null
-          file_type?: string | null
-          id?: string
-          notes?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          file_name?: string
-          file_path?: string
-          file_size?: number | null
-          file_type?: string | null
-          id?: string
-          notes?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_roles: {
         Row: {
+          created_at: string
           id: string
-          role: Database["public"]["Enums"]["app_role"]
+          role: string
           user_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
-          role: Database["public"]["Enums"]["app_role"]
+          role?: string
           user_id: string
         }
         Update: {
+          created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
+          role?: string
           user_id?: string
         }
         Relationships: []
@@ -1211,8 +966,7 @@ export type Database = {
           id: string
           payment_id: string | null
           payment_method: string | null
-          payment_reference: string | null
-          plan_id: string | null
+          plan_id: string
           started_at: string | null
           status: string | null
           updated_at: string
@@ -1225,8 +979,7 @@ export type Database = {
           id?: string
           payment_id?: string | null
           payment_method?: string | null
-          payment_reference?: string | null
-          plan_id?: string | null
+          plan_id: string
           started_at?: string | null
           status?: string | null
           updated_at?: string
@@ -1239,8 +992,7 @@ export type Database = {
           id?: string
           payment_id?: string | null
           payment_method?: string | null
-          payment_reference?: string | null
-          plan_id?: string | null
+          plan_id?: string
           started_at?: string | null
           status?: string | null
           updated_at?: string
@@ -1251,21 +1003,7 @@ export type Database = {
             foreignKeyName: "user_subscriptions_payment_id_fkey"
             columns: ["payment_id"]
             isOneToOne: false
-            referencedRelation: "payment_history"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_subscriptions_payment_id_fkey"
-            columns: ["payment_id"]
-            isOneToOne: false
             referencedRelation: "payments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_subscriptions_payment_id_fkey"
-            columns: ["payment_id"]
-            isOneToOne: false
-            referencedRelation: "payments_secure"
             referencedColumns: ["id"]
           },
           {
@@ -1279,93 +1017,13 @@ export type Database = {
       }
     }
     Views: {
-      payment_history: {
-        Row: {
-          amount: number | null
-          created_at: string | null
-          currency: string | null
-          id: string | null
-          payment_method: string | null
-          payment_reference: string | null
-          project_title: string | null
-          service_type: string | null
-          status: string | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
-      payments_secure: {
-        Row: {
-          amount: number | null
-          created_at: string | null
-          currency: string | null
-          id: string | null
-          payment_method: string | null
-          payment_reference_masked: string | null
-          project_id: string | null
-          service_request_id: string | null
-          status: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          amount?: number | null
-          created_at?: string | null
-          currency?: string | null
-          id?: string | null
-          payment_method?: string | null
-          payment_reference_masked?: never
-          project_id?: string | null
-          service_request_id?: string | null
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string | null
-          currency?: string | null
-          id?: string | null
-          payment_method?: string | null
-          payment_reference_masked?: never
-          project_id?: string | null
-          service_request_id?: string | null
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payments_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_service_request_id_fkey"
-            columns: ["service_request_id"]
-            isOneToOne: false
-            referencedRelation: "service_requests"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
-      generate_invoice_number: { Args: never; Returns: string }
-      generate_referral_code: { Args: { user_id: string }; Returns: string }
-      has_active_subscription: { Args: { user_uuid: string }; Returns: boolean }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1492,8 +1150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "moderator", "user"],
-    },
+    Enums: {},
   },
 } as const

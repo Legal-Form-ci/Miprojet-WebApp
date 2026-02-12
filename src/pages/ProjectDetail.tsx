@@ -88,11 +88,11 @@ const ProjectDetail = () => {
 
   const fetchUpdates = async () => {
     try {
-      const { data } = await supabase
+      const { data } = await (supabase
         .from('project_updates')
         .select('*')
         .eq('project_id', id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       setUpdates(data || []);
     } catch (error) {
