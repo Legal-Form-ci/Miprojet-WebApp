@@ -37,7 +37,7 @@ interface BackupRecord {
   backup_name: string;
   backup_type: string;
   tables_included: string[] | null;
-  file_size: number | null;
+  file_size: string | null;
   format: string;
   status: string;
   created_at: string;
@@ -191,15 +191,15 @@ export const AdminDatabaseManager = () => {
       URL.revokeObjectURL(url);
 
       // Record backup in database
-      await supabase.from('database_backups').insert({
+      await supabase.from('database_backups').insert([{
         backup_name: backupName || `Backup ${format(new Date(), 'dd/MM/yyyy HH:mm')}`,
         backup_type: 'manual',
         tables_included: selectedTables.map(t => t.name),
-        file_size: new Blob([content]).size,
+        file_size: String(new Blob([content]).size),
         format: selectedFormat,
         status: 'completed',
         created_by: user?.id,
-      });
+      }]);
 
       toast({
         title: "Export réussi",
@@ -215,14 +215,14 @@ export const AdminDatabaseManager = () => {
       });
 
       // Record failed backup
-      await supabase.from('database_backups').insert({
+      await supabase.from('database_backups').insert([{
         backup_name: backupName || `Backup ${format(new Date(), 'dd/MM/yyyy HH:mm')}`,
         backup_type: 'manual',
         tables_included: selectedTables.map(t => t.name),
         format: selectedFormat,
         status: 'failed',
         error_message: error.message,
-      });
+      }]);
     } finally {
       setExporting(false);
     }
@@ -291,11 +291,13 @@ export const AdminDatabaseManager = () => {
     }
   };
 
-  const formatFileSize = (bytes: number | null) => {
+  const formatFileSize = (bytes: string | number | null) => {
     if (!bytes) return '-';
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    const numBytes = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes;
+    if (isNaN(numBytes)) return '-';
+    if (numBytes < 1024) return `${numBytes} B`;
+    if (numBytes < 1024 * 1024) return `${(numBytes / 1024).toFixed(1)} KB`;
+    return `${(numBytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   const totalRows = tables.reduce((sum, t) => sum + t.rowCount, 0);

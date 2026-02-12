@@ -125,14 +125,14 @@ export const AdminEvaluationsManager = () => {
     setLoading(true);
     
     // Fetch evaluations with project info
-    const { data: evalData } = await supabase
+    const { data: evalData } = await (supabase
       .from('project_evaluations')
       .select(`
         *,
         project:projects(title, sector, owner_id)
       `)
       .eq('is_active', true)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false }) as any);
 
     if (evalData) {
       setEvaluations(evalData as any);

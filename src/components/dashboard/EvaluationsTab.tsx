@@ -61,12 +61,12 @@ export const EvaluationsTab = ({ projects }: EvaluationsTabProps) => {
       }
 
       const projectIds = projects.map(p => p.id);
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from('project_evaluations')
         .select('id, project_id, score_global, niveau, is_certified, created_at')
         .in('project_id', projectIds)
         .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (!error && data) {
         // Map project titles to evaluations
