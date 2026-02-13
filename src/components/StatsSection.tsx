@@ -95,7 +95,7 @@ export const StatsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-5xl mx-auto">
           {stats.map((stat, index) => (
             <StatCard key={stat.labelKey} stat={stat} index={index} isVisible={isVisible} t={t} />
           ))}

@@ -6,12 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { InvoiceHistory } from "@/components/dashboard/InvoiceHistory";
 import { EvaluationsTab } from "@/components/dashboard/EvaluationsTab";
 import {
   FolderKanban, FileText, MessageSquare, Plus,
-  Eye, Settings, Clock, CheckCircle, Award, ArrowRight
+  Eye, Settings, Clock, CheckCircle, Award, ArrowRight,
+  Crown, AlertTriangle, CreditCard, Calendar
 } from "lucide-react";
 
 interface Project {
@@ -32,6 +34,7 @@ interface ServiceRequest {
 
 export const ProjectOwnerDashboard = () => {
   const { user } = useAuth();
+  const { currentSubscription, hasActiveSubscription, loading: subLoading } = useSubscription();
   const [projects, setProjects] = useState<Project[]>([]);
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -194,8 +197,9 @@ export const ProjectOwnerDashboard = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="projects" className="space-y-4">
-        <TabsList className="w-full sm:w-auto grid grid-cols-5 sm:inline-flex">
+        <TabsList className="w-full sm:w-auto grid grid-cols-6 sm:inline-flex">
           <TabsTrigger value="projects" className="text-xs sm:text-sm">Projets</TabsTrigger>
+          <TabsTrigger value="subscription" className="text-xs sm:text-sm">Abonnement</TabsTrigger>
           <TabsTrigger value="evaluations" className="text-xs sm:text-sm">Évaluations</TabsTrigger>
           <TabsTrigger value="requests" className="text-xs sm:text-sm">Demandes</TabsTrigger>
           <TabsTrigger value="invoices" className="text-xs sm:text-sm">Factures</TabsTrigger>
@@ -244,6 +248,107 @@ export const ProjectOwnerDashboard = () => {
                 </Card>
               ))}
             </div>
+          )}
+        </TabsContent>
+
+        {/* Subscription Tab */}
+        <TabsContent value="subscription" className="space-y-4">
+          {hasActiveSubscription && currentSubscription ? (
+            <div className="space-y-4">
+              <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="p-3 bg-primary/20 rounded-full">
+                      <Crown className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">Abonnement actif</h3>
+                      <p className="text-muted-foreground">
+                        Plan {(currentSubscription as any).plan?.name || 'Premium'}
+                      </p>
+                    </div>
+                    <Badge className="ml-auto bg-success/20 text-success border-success/30">Actif</Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                    <div className="text-center p-3 bg-card rounded-lg border">
+                      <Calendar className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">Début</p>
+                      <p className="font-medium text-sm">
+                        {currentSubscription.started_at 
+                          ? new Date(currentSubscription.started_at).toLocaleDateString('fr-FR')
+                          : 'N/A'}
+                      </p>
+                    </div>
+                    <div className="text-center p-3 bg-card rounded-lg border">
+                      <Clock className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">Expiration</p>
+                      <p className="font-medium text-sm">
+                        {currentSubscription.expires_at 
+                          ? new Date(currentSubscription.expires_at).toLocaleDateString('fr-FR')
+                          : 'Illimité'}
+                      </p>
+                    </div>
+                    <div className="text-center p-3 bg-card rounded-lg border">
+                      <CreditCard className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">Méthode</p>
+                      <p className="font-medium text-sm capitalize">
+                        {(currentSubscription as any).payment_method || 'Wave'}
+                      </p>
+                    </div>
+                    <div className="text-center p-3 bg-card rounded-lg border">
+                      <Crown className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">Renouvellement</p>
+                      <p className="font-medium text-sm">
+                        {currentSubscription.auto_renew ? 'Automatique' : 'Manuel'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Expiration warning */}
+                  {currentSubscription.expires_at && (() => {
+                    const daysLeft = Math.ceil((new Date(currentSubscription.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                    if (daysLeft <= 7 && daysLeft > 0) {
+                      return (
+                        <div className="mt-4 p-3 bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4 text-warning" />
+                          <p className="text-sm text-warning">
+                            Votre abonnement expire dans {daysLeft} jour{daysLeft > 1 ? 's' : ''}. Pensez à le renouveler.
+                          </p>
+                          <Link to="/subscription" className="ml-auto">
+                            <Button size="sm" variant="outline">Renouveler</Button>
+                          </Link>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                </CardContent>
+              </Card>
+
+              <Link to="/opportunities">
+                <Button className="gap-2">
+                  <Crown className="h-4 w-4" />
+                  Accéder aux opportunités
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Crown className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Aucun abonnement actif</h3>
+                <p className="text-muted-foreground mb-4">
+                  Souscrivez à un abonnement pour accéder aux opportunités exclusives
+                </p>
+                <Link to="/subscription">
+                  <Button className="gap-2">
+                    <Crown className="h-4 w-4" />
+                    S'abonner
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
 

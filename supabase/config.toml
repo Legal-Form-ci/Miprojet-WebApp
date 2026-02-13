@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.wave-webhook]
 verify_jwt = false
+
+[functions.wave-payout]
+verify_jwt = false

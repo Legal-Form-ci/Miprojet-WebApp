@@ -148,7 +148,7 @@ const Opportunities = () => {
             <h1 className="text-3xl font-bold mb-4">Contenu réservé aux abonnés</h1>
             <p className="text-lg text-muted-foreground mb-8">
               Accédez à des centaines d'opportunités de financement, formations, 
-              accompagnements et partenariats exclusifs en devenant membre MIPROJET.
+              accompagnements et partenariats exclusifs en vous abonnant à MIPROJET.
             </p>
             
             {/* Preview Cards - Blurred */}
@@ -174,7 +174,7 @@ const Opportunities = () => {
 
             <Button size="lg" onClick={() => navigate('/subscription')} className="gap-2">
               <Crown className="h-5 w-5" />
-              Devenir membre
+              S'abonner
             </Button>
           </div>
         </main>
@@ -192,7 +192,7 @@ const Opportunities = () => {
           <div className="flex items-center gap-2 mb-2">
             <Badge className="bg-primary/10 text-primary">
               <Crown className="h-3 w-3 mr-1" />
-              ESPACE MEMBRE
+              ESPACE ABONNÉ
             </Badge>
           </div>
           <h1 className="text-3xl font-bold mb-2">Opportunités Exclusives</h1>

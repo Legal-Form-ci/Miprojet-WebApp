@@ -113,7 +113,7 @@ export const AdminCharts = () => {
       <Card>
         <CardHeader>
           <CardTitle>Croissance Utilisateurs</CardTitle>
-          <CardDescription>Nouveaux membres par mois</CardDescription>
+          <CardDescription>Nouveaux abonnés par mois</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>

@@ -75,7 +75,7 @@ export const AdminStats = () => {
     {
       title: "Utilisateurs",
       value: stats.totalUsers,
-      description: "Membres inscrits",
+      description: "Abonnés inscrits",
       icon: Users,
       color: "text-info",
       bgColor: "bg-info/10",

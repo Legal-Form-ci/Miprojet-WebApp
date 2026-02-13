@@ -65,7 +65,7 @@ export const Navigation = () => {
               Opportunités
             </Link>
             <Link to="/subscription" className="text-accent font-medium hover:text-accent/80 transition-colors text-sm flex items-center gap-1">
-              <span className="text-xs">👑</span> Espace Membre
+              <span className="text-xs">👑</span> Espace Abonné
             </Link>
             <Link to="/contact" className="text-foreground hover:text-primary transition-colors text-sm">
               {t('nav.contact')}
@@ -96,7 +96,7 @@ export const Navigation = () => {
                     <div className="flex flex-col">
                       <p className="text-sm font-medium truncate">{user.email}</p>
                       <p className="text-xs text-muted-foreground">
-                        {isAdmin ? 'Administrateur' : 'Membre'}
+                        {isAdmin ? 'Administrateur' : 'Abonné'}
                       </p>
                     </div>
                   </div>
@@ -195,7 +195,7 @@ export const Navigation = () => {
               className="block text-accent font-medium hover:text-accent/80 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              👑 Espace Membre
+              👑 Espace Abonné
             </Link>
             <Link
               to="/contact"

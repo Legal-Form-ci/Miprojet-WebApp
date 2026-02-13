@@ -82,7 +82,7 @@ const Subscription = () => {
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20">
             <Crown className="h-3 w-3 mr-1" />
-            ESPACE MEMBRE
+            ESPACE ABONNÉ
           </Badge>
           <h1 className="text-4xl font-bold mb-4">
             Accédez aux Meilleures <span className="text-primary">Opportunités</span>
@@ -191,32 +191,30 @@ const Subscription = () => {
         <Card className="mb-12">
           <CardContent className="p-8">
             <h3 className="text-xl font-semibold text-center mb-6">
-              Moyens de paiement acceptés
+              💳 Moyens de paiement acceptés
             </h3>
             <div className="flex flex-wrap justify-center gap-8">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Smartphone className="h-6 w-6" />
-                <span>Mobile Money</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <CreditCard className="h-6 w-6" />
-                <span>Carte bancaire</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
                 <Wallet className="h-6 w-6" />
-                <span>Wave, Orange Money, MTN</span>
+                <span className="font-semibold text-foreground">Wave</span>
               </div>
             </div>
             <p className="text-center text-sm text-muted-foreground mt-4">
               <Shield className="inline h-4 w-4 mr-1" />
               Paiements sécurisés par Wave
             </p>
+            <p className="text-center text-sm text-muted-foreground mt-2">
+              En cas de difficulté avec Wave ou d'indisponibilité dans votre pays, merci de nous contacter pour une solution adaptée.
+            </p>
+            <p className="text-center text-sm font-medium text-primary mt-1">
+              WhatsApp : 0759566087
+            </p>
           </CardContent>
         </Card>
 
         {/* Benefits Section */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-4">Pourquoi devenir membre ?</h2>
+          <h2 className="text-2xl font-bold mb-4">Pourquoi s'abonner ?</h2>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <Card className="p-6">
               <Zap className="h-10 w-10 text-primary mx-auto mb-4" />
