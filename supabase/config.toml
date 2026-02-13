@@ -36,8 +36,8 @@ verify_jwt = false
 [functions.create-admin]
 verify_jwt = false
 
-[functions.cinetpay-payment]
+[functions.wave-payment]
 verify_jwt = false
 
-[functions.cinetpay-webhook]
+[functions.wave-webhook]
 verify_jwt = false
