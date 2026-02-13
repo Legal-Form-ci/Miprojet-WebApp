@@ -966,6 +966,7 @@ export type Database = {
           id: string
           payment_id: string | null
           payment_method: string | null
+          payment_reference: string | null
           plan_id: string
           started_at: string | null
           status: string | null
@@ -979,6 +980,7 @@ export type Database = {
           id?: string
           payment_id?: string | null
           payment_method?: string | null
+          payment_reference?: string | null
           plan_id: string
           started_at?: string | null
           status?: string | null
@@ -992,6 +994,7 @@ export type Database = {
           id?: string
           payment_id?: string | null
           payment_method?: string | null
+          payment_reference?: string | null
           plan_id?: string
           started_at?: string | null
           status?: string | null

@@ -120,18 +120,31 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground text-center md:text-left">
-            © {new Date().getFullYear()} MIPROJET. {t('footer.rights')}.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
-            <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
-              {t('footer.privacy')}
-            </Link>
-            <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">
-              {t('footer.terms')}
-            </Link>
+        <div className="mt-12 pt-8 border-t border-border flex flex-col items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center w-full gap-4">
+            <p className="text-sm text-muted-foreground text-center md:text-left">
+              © {new Date().getFullYear()} MIPROJET. {t('footer.rights')}.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
+              <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+                {t('footer.privacy')}
+              </Link>
+              <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">
+                {t('footer.terms')}
+              </Link>
+            </div>
           </div>
+          <p className="text-xs text-muted-foreground">
+            Plateforme développée par{" "}
+            <a 
+              href="https://www.ikoffi.agricapital.ci" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline font-medium"
+            >
+              Inocent KOFFI
+            </a>
+          </p>
         </div>
       </div>
     </footer>
