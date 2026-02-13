@@ -209,7 +209,7 @@ const Subscription = () => {
             </div>
             <p className="text-center text-sm text-muted-foreground mt-4">
               <Shield className="inline h-4 w-4 mr-1" />
-              Paiements sécurisés par CinetPay
+              Paiements sécurisés par Wave
             </p>
           </CardContent>
         </Card>

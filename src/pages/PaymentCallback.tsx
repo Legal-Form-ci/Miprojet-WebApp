@@ -29,7 +29,7 @@ const PaymentCallback = () => {
 
       console.log('Payment callback params:', { transactionId, paymentStatus, reference });
 
-      // If status is directly provided in URL (from KKIAPAY)
+      // If status is directly provided in URL (from Wave redirect)
       if (paymentStatus) {
         if (paymentStatus === 'approved' || paymentStatus === 'completed' || paymentStatus === 'success') {
           setStatus('success');

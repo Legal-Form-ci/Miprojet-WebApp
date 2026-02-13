@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useKkiapay } from "@/hooks/useKkiapay";
 import { useNotifications } from "@/hooks/useNotifications";
 import { 
   CreditCard, Shield, 
@@ -34,86 +33,8 @@ export const PaymentModal = ({
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [currentPaymentRef, setCurrentPaymentRef] = useState<string | null>(null);
 
   const predefinedAmounts = [5000, 10000, 25000, 50000, 100000];
-
-  const handlePaymentSuccess = async (data: { transactionId: string }) => {
-    console.log('Payment success:', data);
-    setIsProcessing(false);
-    
-    try {
-      // Update payment record with transaction ID
-      if (currentPaymentRef) {
-        await supabase
-          .from('payments')
-          .update({ 
-            status: 'completed',
-            payment_reference: data.transactionId,
-          })
-          .eq('payment_reference', currentPaymentRef);
-      }
-
-      // Get current user for notification
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        // Create user notification
-        await createNotification({
-          userId: user.id,
-          title: 'Paiement réussi',
-          message: `Votre paiement de ${parseFloat(amount).toLocaleString()} FCFA a été confirmé.`,
-          type: 'success',
-          link: '/dashboard',
-        });
-
-        // Notify admins
-        await createAdminNotification({
-          title: 'Nouveau paiement reçu',
-          message: `Un paiement de ${parseFloat(amount).toLocaleString()} FCFA a été effectué pour ${projectTitle}.`,
-          type: 'success',
-          link: '/admin',
-        });
-      }
-
-      setStep(3);
-      toast({
-        title: "Paiement réussi !",
-        description: `Votre paiement de ${parseFloat(amount).toLocaleString()} FCFA a été confirmé.`,
-      });
-    } catch (error) {
-      console.error('Error updating payment:', error);
-    }
-  };
-
-  const handlePaymentFailed = async (data: any) => {
-    console.log('Payment failed:', data);
-    setIsProcessing(false);
-    
-    // Update payment status to failed
-    if (currentPaymentRef) {
-      await supabase
-        .from('payments')
-        .update({ status: 'failed' })
-        .eq('payment_reference', currentPaymentRef);
-    }
-
-    toast({
-      title: "Paiement échoué",
-      description: "Une erreur est survenue. Veuillez réessayer.",
-      variant: "destructive",
-    });
-  };
-
-  const { openPayment } = useKkiapay({
-    onSuccess: handlePaymentSuccess,
-    onFailed: handlePaymentFailed,
-    onClose: () => {
-      if (isProcessing) {
-        setIsProcessing(false);
-      }
-    },
-  });
 
   const handlePayment = async () => {
     const numericAmount = parseFloat(amount);
@@ -130,69 +51,41 @@ export const PaymentModal = ({
     setIsProcessing(true);
 
     try {
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast({
-          title: "Non connecté",
-          description: "Veuillez vous connecter pour effectuer un paiement",
-          variant: "destructive",
-        });
+        toast({ title: "Non connecté", description: "Veuillez vous connecter", variant: "destructive" });
         setIsProcessing(false);
         return;
       }
 
-      // Get user profile for name and email
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, phone')
-        .eq('id', user.id)
-        .single();
+      const { data: { session } } = await supabase.auth.getSession();
 
-      // Generate payment reference
-      const paymentRef = `MIP-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-      setCurrentPaymentRef(paymentRef);
+      const successUrl = `${window.location.origin}/payment/callback?status=success`;
+      const errorUrl = `${window.location.origin}/payment/callback?status=failed`;
 
-      // Create payment record in database
-      const { error: paymentError } = await supabase.from('payments').insert({
-        user_id: user.id,
-        amount: numericAmount,
-        payment_method: 'kkiapay',
-        payment_reference: paymentRef,
-        status: 'pending',
-        project_id: projectId || null,
-        service_request_id: serviceRequestId || null,
-        currency: 'XOF',
-        metadata: {
-          project_title: projectTitle,
+      const { data, error } = await supabase.functions.invoke('wave-payment', {
+        body: {
+          amount: numericAmount,
+          description: `Paiement MIPROJET - ${projectTitle}`,
+          success_url: successUrl,
+          error_url: errorUrl,
         },
       });
 
-      if (paymentError) {
-        throw paymentError;
+      if (error) throw error;
+
+      if (data?.wave_launch_url) {
+        window.location.href = data.wave_launch_url;
+      } else {
+        throw new Error('URL de paiement non reçue');
       }
 
-      // Open KKIAPAY widget
-      openPayment({
-        amount: numericAmount,
-        reason: `Paiement MIPROJET - ${projectTitle}`,
-        name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : undefined,
-        email: user.email,
-        phone: profile?.phone || undefined,
-        data: JSON.stringify({ 
-          paymentRef, 
-          projectId, 
-          serviceRequestId,
-          userId: user.id 
-        }),
-      });
-
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment error:', error);
       setIsProcessing(false);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        description: error.message || "Une erreur est survenue. Veuillez réessayer.",
         variant: "destructive",
       });
     }
@@ -201,7 +94,6 @@ export const PaymentModal = ({
   const resetModal = () => {
     setStep(1);
     setAmount("");
-    setCurrentPaymentRef(null);
     setIsProcessing(false);
     onClose();
   };
@@ -254,28 +146,28 @@ export const PaymentModal = ({
             <div className="p-4 bg-muted rounded-lg">
               <div className="flex items-center gap-3 mb-3">
                 <CreditCard className="h-5 w-5 text-primary" />
-                <span className="font-medium text-foreground">Méthodes de paiement acceptées</span>
+                <span className="font-medium text-foreground">Paiement via Wave</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Mobile Money (Orange, MTN, Moov, Wave), Carte bancaire (Visa, Mastercard)
+                Vous serez redirigé vers Wave pour finaliser votre paiement en toute sécurité.
               </p>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Shield className="h-4 w-4 text-success" />
-              <span>Paiement sécurisé par KKIAPAY</span>
+              <span>Paiement sécurisé par Wave</span>
             </div>
 
             <Button 
               variant="default" 
-              className="w-full bg-primary hover:bg-primary/90"
+              className="w-full"
               onClick={handlePayment}
               disabled={!amount || parseFloat(amount) < minAmount || isProcessing}
             >
               {isProcessing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Traitement...
+                  Redirection vers Wave...
                 </>
               ) : (
                 `Payer ${amount ? parseFloat(amount).toLocaleString() : '0'} FCFA`
