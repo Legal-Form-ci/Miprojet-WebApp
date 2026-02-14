@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { MathCaptcha } from "@/components/MathCaptcha";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { z } from "zod";
 
@@ -25,6 +26,8 @@ const Auth = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,30 +36,33 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [captchaValid, setCaptchaValid] = useState(false);
 
   useEffect(() => {
     document.title = mode === "login" ? "Connexion | MIPROJET" : "Inscription | MIPROJET";
     
-    // Check if user is already logged in and redirect appropriately
     const checkSessionAndRedirect = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        // Check if user is admin
         const { data: roleData } = await supabase.rpc('has_role', {
           _user_id: data.session.user.id,
           _role: 'admin'
         });
         
         if (roleData === true) {
-          navigate('/admin');
+          navigate(redirect || '/admin');
         } else {
-          navigate('/dashboard');
+          navigate(redirect || '/dashboard');
         }
       }
     };
     
     checkSessionAndRedirect();
-  }, [mode, navigate]);
+  }, [mode, navigate, redirect]);
+
+  const handleCaptchaChange = useCallback((isValid: boolean) => {
+    setCaptchaValid(isValid);
+  }, []);
 
   const validate = () => {
     try {
@@ -83,6 +89,12 @@ const Auth = () => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!captchaValid) {
+      toast({ title: "Vérification requise", description: "Veuillez résoudre le calcul de sécurité.", variant: "destructive" });
+      return;
+    }
+    
     if (!validate()) return;
     
     setLoading(true);
@@ -96,7 +108,6 @@ const Auth = () => {
           throw error;
         }
         
-        // Check if user is admin and redirect appropriately
         if (authData.user) {
           const { data: roleData } = await supabase.rpc('has_role', {
             _user_id: authData.user.id,
@@ -106,9 +117,9 @@ const Auth = () => {
           toast({ title: t('auth.loginSuccess'), description: t('auth.welcome') });
           
           if (roleData === true) {
-            navigate('/admin');
+            navigate(redirect || '/admin');
           } else {
-            navigate('/dashboard');
+            navigate(redirect || '/dashboard');
           }
         }
       } else {
@@ -160,13 +171,7 @@ const Auth = () => {
                     <Label htmlFor="firstName">{t('auth.firstName')}</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="firstName"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="pl-10"
-                        placeholder="Jean"
-                      />
+                      <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="pl-10" placeholder="Jean" />
                     </div>
                     {errors.firstName && <p className="text-sm text-destructive">{errors.firstName}</p>}
                   </div>
@@ -174,13 +179,7 @@ const Auth = () => {
                     <Label htmlFor="lastName">{t('auth.lastName')}</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="lastName"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="pl-10"
-                        placeholder="Dupont"
-                      />
+                      <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} className="pl-10" placeholder="Dupont" />
                     </div>
                     {errors.lastName && <p className="text-sm text-destructive">{errors.lastName}</p>}
                   </div>
@@ -191,15 +190,7 @@ const Auth = () => {
                 <Label htmlFor="email">{t('auth.email')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    placeholder="vous@exemple.com"
-                    required
-                  />
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10" placeholder="vous@exemple.com" required />
                 </div>
                 {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
@@ -209,17 +200,10 @@ const Auth = () => {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
-                    placeholder="••••••••"
-                    required
+                    id="password" type={showPassword ? "text" : "password"} value={password}
+                    onChange={(e) => setPassword(e.target.value)} className="pl-10 pr-10" placeholder="••••••••" required
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                   >
@@ -228,8 +212,11 @@ const Auth = () => {
                 </div>
                 {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
               </div>
+
+              {/* Math CAPTCHA */}
+              <MathCaptcha onValidChange={handleCaptchaChange} />
               
-              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+              <Button type="submit" className="w-full" size="lg" disabled={loading || !captchaValid}>
                 {loading ? t('common.loading') : mode === "login" ? t('auth.login') : t('auth.signup')}
               </Button>
             </form>
@@ -237,9 +224,8 @@ const Auth = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 {mode === "login" ? t('auth.noAccount') : t('auth.hasAccount')}{" "}
-                <button
-                  className="text-primary font-medium hover:underline"
-                  onClick={() => setMode(mode === "login" ? "signup" : "login")}
+                <button className="text-primary font-medium hover:underline"
+                  onClick={() => { setMode(mode === "login" ? "signup" : "login"); setCaptchaValid(false); }}
                 >
                   {mode === "login" ? t('auth.createAccount') : t('auth.loginNow')}
                 </button>

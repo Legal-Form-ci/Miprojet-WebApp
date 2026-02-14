@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { 
   Check, Crown, Zap, Sparkles, Star, Shield, 
-  Clock, CreditCard, Smartphone, Wallet, Loader2
+  Clock, Wallet, Loader2
 } from "lucide-react";
 
 const Subscription = () => {
@@ -18,8 +18,6 @@ const Subscription = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { plans, currentSubscription, hasActiveSubscription, loading } = useSubscription();
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     document.title = "Abonnements | MIPROJET";
@@ -27,7 +25,6 @@ const Subscription = () => {
 
   const getPlanIcon = (durationType: string) => {
     switch (durationType) {
-      case 'weekly': return Clock;
       case 'monthly': return Zap;
       case 'quarterly': return Star;
       case 'semiannual': return Sparkles;
@@ -36,29 +33,32 @@ const Subscription = () => {
     }
   };
 
-  const getPlanColor = (durationType: string) => {
+  const getPlanBgColor = (durationType: string) => {
     switch (durationType) {
-      case 'weekly': return 'from-blue-500 to-blue-600';
-      case 'monthly': return 'from-green-500 to-green-600';
+      case 'monthly': return 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800';
+      case 'quarterly': return 'bg-purple-50 dark:bg-purple-950/30 border-purple-200 dark:border-purple-800';
+      case 'semiannual': return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800';
+      case 'annual': return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800';
+      default: return 'bg-muted';
+    }
+  };
+
+  const getPlanAccentColor = (durationType: string) => {
+    switch (durationType) {
+      case 'monthly': return 'from-blue-500 to-blue-600';
       case 'quarterly': return 'from-purple-500 to-purple-600';
-      case 'semiannual': return 'from-orange-500 to-orange-600';
-      case 'annual': return 'from-yellow-500 to-yellow-600';
+      case 'semiannual': return 'from-emerald-500 to-emerald-600';
+      case 'annual': return 'from-amber-500 to-amber-600';
       default: return 'from-primary to-primary/80';
     }
   };
 
   const handleSubscribe = async (planId: string) => {
     if (!user) {
-      toast({
-        title: "Connexion requise",
-        description: "Veuillez vous connecter pour souscrire à un abonnement.",
-        variant: "destructive",
-      });
+      toast({ title: "Connexion requise", description: "Veuillez vous connecter pour souscrire.", variant: "destructive" });
       navigate("/auth?redirect=/subscription");
       return;
     }
-
-    setSelectedPlan(planId);
     navigate(`/subscription/checkout?plan=${planId}`);
   };
 
@@ -96,7 +96,7 @@ const Subscription = () => {
         {/* Current Subscription Banner */}
         {hasActiveSubscription && currentSubscription && (
           <Card className="mb-8 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="flex items-center justify-between p-6">
+            <CardContent className="flex flex-col sm:flex-row items-center justify-between p-6 gap-4">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-primary/20 rounded-full">
                   <Crown className="h-6 w-6 text-primary" />
@@ -109,46 +109,42 @@ const Subscription = () => {
                   </p>
                 </div>
               </div>
-              <Button onClick={() => navigate('/opportunities')}>
-                Voir les opportunités
-              </Button>
+              <Button onClick={() => navigate('/opportunities')}>Voir les opportunités</Button>
             </CardContent>
           </Card>
         )}
 
         {/* Pricing Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 mb-12">
-          {plans.map((plan, index) => {
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
+          {plans.map((plan) => {
             const Icon = getPlanIcon(plan.duration_type);
-            const isPopular = plan.duration_type === 'quarterly';
+            const isMostChosen = plan.duration_type === 'semiannual';
             const isBestValue = plan.duration_type === 'annual';
             
             return (
               <Card 
                 key={plan.id} 
-                className={`relative transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-                  isPopular ? 'border-primary ring-2 ring-primary/20' : ''
-                } ${isBestValue ? 'border-yellow-500 ring-2 ring-yellow-500/20' : ''}`}
+                className={`relative transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${getPlanBgColor(plan.duration_type)} ${
+                  isBestValue ? 'ring-2 ring-amber-500/50 scale-[1.02]' : ''
+                } ${isMostChosen ? 'ring-2 ring-emerald-500/50' : ''}`}
               >
-                {isPopular && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
-                    Populaire
+                {isMostChosen && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white whitespace-nowrap">
+                    ⭐ Le plus choisi
                   </Badge>
                 )}
                 {isBestValue && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-black">
-                    Meilleure offre
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white whitespace-nowrap">
+                    🏆 Offre la plus avantageuse
                   </Badge>
                 )}
                 
                 <CardHeader className="text-center pb-2">
-                  <div className={`mx-auto p-3 rounded-full bg-gradient-to-br ${getPlanColor(plan.duration_type)} text-white mb-3`}>
+                  <div className={`mx-auto p-3 rounded-full bg-gradient-to-br ${getPlanAccentColor(plan.duration_type)} text-white mb-3`}>
                     <Icon className="h-6 w-6" />
                   </div>
                   <CardTitle className="text-lg">{plan.name}</CardTitle>
-                  <CardDescription className="text-sm min-h-[40px]">
-                    {plan.description}
-                  </CardDescription>
+                  <CardDescription className="text-sm min-h-[40px]">{plan.description}</CardDescription>
                 </CardHeader>
                 
                 <CardContent className="text-center">
@@ -158,15 +154,15 @@ const Subscription = () => {
                   </div>
                   
                   <ul className="space-y-2 text-sm text-left">
-                    {plan.features.slice(0, 4).map((feature, i) => (
+                    {plan.features.slice(0, 5).map((feature, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-success mt-0.5 shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
-                    {plan.features.length > 4 && (
+                    {plan.features.length > 5 && (
                       <li className="text-muted-foreground text-xs">
-                        + {plan.features.length - 4} autres avantages
+                        + {plan.features.length - 5} autres avantages
                       </li>
                     )}
                   </ul>
@@ -174,12 +170,12 @@ const Subscription = () => {
                 
                 <CardFooter>
                   <Button 
-                    className={`w-full ${isPopular || isBestValue ? 'bg-gradient-to-r ' + getPlanColor(plan.duration_type) : ''}`}
-                    variant={isPopular || isBestValue ? 'default' : 'outline'}
+                    className={`w-full ${isBestValue || isMostChosen ? 'bg-gradient-to-r ' + getPlanAccentColor(plan.duration_type) + ' text-white' : ''}`}
+                    variant={isBestValue || isMostChosen ? 'default' : 'outline'}
                     onClick={() => handleSubscribe(plan.id)}
                     disabled={hasActiveSubscription}
                   >
-                    {hasActiveSubscription ? 'Déjà abonné' : 'Choisir ce plan'}
+                    {hasActiveSubscription ? 'Déjà abonné' : "S'abonner"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -190,9 +186,7 @@ const Subscription = () => {
         {/* Payment Methods */}
         <Card className="mb-12">
           <CardContent className="p-8">
-            <h3 className="text-xl font-semibold text-center mb-6">
-              💳 Moyens de paiement acceptés
-            </h3>
+            <h3 className="text-xl font-semibold text-center mb-6">💳 Moyens de paiement acceptés</h3>
             <div className="flex flex-wrap justify-center gap-8">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Wallet className="h-6 w-6" />
@@ -206,36 +200,32 @@ const Subscription = () => {
             <p className="text-center text-sm text-muted-foreground mt-2">
               En cas de difficulté avec Wave ou d'indisponibilité dans votre pays, merci de nous contacter pour une solution adaptée.
             </p>
-            <p className="text-center text-sm font-medium text-primary mt-1">
-              WhatsApp : 0759566087
+            <p className="text-center text-sm font-medium mt-1">
+              <a href="https://wa.me/+2250759566087" target="_blank" rel="noopener" className="text-primary hover:underline">
+                WhatsApp : 0759566087
+              </a>
             </p>
           </CardContent>
         </Card>
 
-        {/* Benefits Section */}
+        {/* Benefits */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold mb-4">Pourquoi s'abonner ?</h2>
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <Card className="p-6">
               <Zap className="h-10 w-10 text-primary mx-auto mb-4" />
               <h3 className="font-semibold mb-2">Opportunités Exclusives</h3>
-              <p className="text-sm text-muted-foreground">
-                Accès prioritaire aux appels à projets, subventions et financements
-              </p>
+              <p className="text-sm text-muted-foreground">Accès prioritaire aux appels à projets, subventions et financements</p>
             </Card>
             <Card className="p-6">
               <Star className="h-10 w-10 text-primary mx-auto mb-4" />
               <h3 className="font-semibold mb-2">Formations Premium</h3>
-              <p className="text-sm text-muted-foreground">
-                Webinaires, ateliers et formations en gestion de projet
-              </p>
+              <p className="text-sm text-muted-foreground">Webinaires, ateliers et formations en gestion de projet</p>
             </Card>
             <Card className="p-6">
               <Shield className="h-10 w-10 text-primary mx-auto mb-4" />
               <h3 className="font-semibold mb-2">Accompagnement VIP</h3>
-              <p className="text-sm text-muted-foreground">
-                Support dédié et orientation vers les partenaires adaptés
-              </p>
+              <p className="text-sm text-muted-foreground">Support dédié et orientation vers les partenaires adaptés</p>
             </Card>
           </div>
         </div>
