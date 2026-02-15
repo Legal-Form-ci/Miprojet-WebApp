@@ -58,12 +58,23 @@ const SubscriptionCheckout = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Wave payment invoke error:', error);
+        throw new Error(error.message || 'Erreur lors de la communication avec le service de paiement');
+      }
+
+      if (data?.error) {
+        console.error('Wave payment data error:', data.error);
+        if (data.preview_mode) {
+          throw new Error('Le service Wave n\'est pas encore configuré. Contactez l\'administrateur.');
+        }
+        throw new Error(data.error);
+      }
 
       if (data?.wave_launch_url) {
         window.location.href = data.wave_launch_url;
       } else {
-        throw new Error('URL de paiement non reçue');
+        throw new Error('URL de paiement non reçue. Veuillez réessayer.');
       }
       
     } catch (error: any) {
