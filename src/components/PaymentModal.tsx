@@ -72,7 +72,17 @@ export const PaymentModal = ({
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Wave payment invoke error:', error);
+        throw new Error(error.message || 'Erreur de communication avec Wave');
+      }
+
+      if (data?.error) {
+        if (data.preview_mode) {
+          throw new Error('Le service Wave n\'est pas encore configuré.');
+        }
+        throw new Error(data.error);
+      }
 
       if (data?.wave_launch_url) {
         window.location.href = data.wave_launch_url;

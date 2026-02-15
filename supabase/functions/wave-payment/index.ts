@@ -80,12 +80,20 @@ serve(async (req) => {
       }),
     });
 
-    const waveResult = await waveResponse.json();
-    console.log('Wave response:', JSON.stringify(waveResult));
+    const waveText = await waveResponse.text();
+    console.log('Wave response status:', waveResponse.status, 'body:', waveText);
+
+    let waveResult;
+    try {
+      waveResult = JSON.parse(waveText);
+    } catch {
+      waveResult = { message: waveText };
+    }
 
     if (!waveResponse.ok) {
       await supabaseClient.from('payments').update({ status: 'failed' }).eq('id', payment.id);
-      return new Response(JSON.stringify({ error: waveResult.message || 'Erreur Wave' }), {
+      console.error('Wave API error:', waveResponse.status, waveText);
+      return new Response(JSON.stringify({ error: waveResult.message || waveResult.detail || `Erreur Wave (${waveResponse.status})` }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }

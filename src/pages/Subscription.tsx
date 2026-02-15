@@ -143,7 +143,7 @@ const Subscription = () => {
                   <div className={`mx-auto p-3 rounded-full bg-gradient-to-br ${getPlanAccentColor(plan.duration_type)} text-white mb-3`}>
                     <Icon className="h-6 w-6" />
                   </div>
-                  <CardTitle className="text-lg">{plan.name}</CardTitle>
+                  <CardTitle className="text-lg">💳 {plan.price.toLocaleString()} FCFA — {plan.name}</CardTitle>
                   <CardDescription className="text-sm min-h-[40px]">{plan.description}</CardDescription>
                 </CardHeader>
                 
@@ -151,20 +151,16 @@ const Subscription = () => {
                   <div className="mb-4">
                     <span className="text-4xl font-bold">{plan.price.toLocaleString()}</span>
                     <span className="text-muted-foreground ml-1">FCFA</span>
+                    <p className="text-xs text-muted-foreground mt-1">{plan.duration_days} jours</p>
                   </div>
                   
                   <ul className="space-y-2 text-sm text-left">
-                    {plan.features.slice(0, 5).map((feature, i) => (
+                    {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-success mt-0.5 shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
-                    {plan.features.length > 5 && (
-                      <li className="text-muted-foreground text-xs">
-                        + {plan.features.length - 5} autres avantages
-                      </li>
-                    )}
                   </ul>
                 </CardContent>
                 
