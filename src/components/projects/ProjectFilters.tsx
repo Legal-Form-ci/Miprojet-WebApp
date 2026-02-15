@@ -131,8 +131,9 @@ export const ProjectFilters = ({ filters: externalFilters, onFilterChange, onCle
   };
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
+    const actualValue = value === "all" ? "" : value;
     setFilters((prev) => {
-      const newFilters = { ...prev, [key]: value };
+      const newFilters = { ...prev, [key]: actualValue };
       // Reset dependent fields
       if (key === "country") {
         newFilters.region = "";
@@ -191,13 +192,13 @@ export const ProjectFilters = ({ filters: externalFilters, onFilterChange, onCle
 
         {/* Quick Filters */}
         <div className="flex flex-wrap gap-2">
-          <Select value={filters.sector} onValueChange={(v) => handleFilterChange("sector", v)}>
+          <Select value={filters.sector || "all"} onValueChange={(v) => handleFilterChange("sector", v)}>
             <SelectTrigger className="w-full sm:w-[160px] bg-background">
               <Tag className="h-4 w-4 mr-2 flex-shrink-0" />
               <SelectValue placeholder="Secteur" />
             </SelectTrigger>
             <SelectContent className="bg-popover">
-              <SelectItem value="">Tous les secteurs</SelectItem>
+              <SelectItem value="all">Tous les secteurs</SelectItem>
               {sectors.map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
@@ -206,13 +207,13 @@ export const ProjectFilters = ({ filters: externalFilters, onFilterChange, onCle
             </SelectContent>
           </Select>
 
-          <Select value={filters.country} onValueChange={(v) => handleFilterChange("country", v)}>
+          <Select value={filters.country || "all"} onValueChange={(v) => handleFilterChange("country", v)}>
             <SelectTrigger className="w-full sm:w-[160px] bg-background">
               <Globe className="h-4 w-4 mr-2 flex-shrink-0" />
               <SelectValue placeholder="Pays" />
             </SelectTrigger>
             <SelectContent className="bg-popover">
-              <SelectItem value="">Tous les pays</SelectItem>
+              <SelectItem value="all">Tous les pays</SelectItem>
               {countries.map((c) => (
                 <SelectItem key={c} value={c}>
                   {c}
@@ -244,13 +245,13 @@ export const ProjectFilters = ({ filters: externalFilters, onFilterChange, onCle
         {/* Advanced Filters */}
         {showAdvanced && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t">
-            <Select value={filters.category} onValueChange={(v) => handleFilterChange("category", v)}>
+            <Select value={filters.category || "all"} onValueChange={(v) => handleFilterChange("category", v)}>
               <SelectTrigger className="bg-background">
                 <Building2 className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Catégorie" />
               </SelectTrigger>
               <SelectContent className="bg-popover">
-                <SelectItem value="">Toutes les catégories</SelectItem>
+                <SelectItem value="all">Toutes les catégories</SelectItem>
                 {categories.map((c) => (
                   <SelectItem key={c} value={c}>
                     {c}
@@ -260,7 +261,7 @@ export const ProjectFilters = ({ filters: externalFilters, onFilterChange, onCle
             </Select>
 
             <Select
-              value={filters.region}
+              value={filters.region || "all"}
               onValueChange={(v) => handleFilterChange("region", v)}
               disabled={!filters.country}
             >
@@ -269,7 +270,7 @@ export const ProjectFilters = ({ filters: externalFilters, onFilterChange, onCle
                 <SelectValue placeholder="Région" />
               </SelectTrigger>
               <SelectContent className="bg-popover">
-                <SelectItem value="">Toutes les régions</SelectItem>
+                <SelectItem value="all">Toutes les régions</SelectItem>
                 {availableRegions.map((r) => (
                   <SelectItem key={r} value={r}>
                     {r}
